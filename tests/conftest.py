@@ -9,10 +9,9 @@ from app.db.models.real_world_example import RealWorldExample
 import pytest
 from dotenv import load_dotenv
 from omegaconf import OmegaConf
-import os
 load_dotenv()
 
-config = OmegaConf.load(f"config/db.yaml")
+config = OmegaConf.load("config/db.yaml")
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{config.db.username}:{config.db.password}@{config.db.host}:{config.db.port}/{config.db.name}'
 

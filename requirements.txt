@@ -7,3 +7,4 @@ python_dotenv
 psycopg2-binary
 pytest
 ruff
+coverage

@@ -1,12 +1,11 @@
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from omegaconf import OmegaConf
 from dotenv import load_dotenv
-import os
 load_dotenv()
 
-config = OmegaConf.load(f"config/db.yaml")
+config = OmegaConf.load("config/db.yaml")
 
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{config.db.username}:{config.db.password}@{config.db.host}:{config.db.port}/{config.db.name}'
