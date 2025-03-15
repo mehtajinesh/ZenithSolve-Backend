@@ -8,3 +8,7 @@ venv
 # Ignore python cache files
 __pycache__/
 
+# Ignore Environment variable files
+.env
+
+.vscode

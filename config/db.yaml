@@ -1,0 +1,6 @@
+db:
+  username: ${oc.env:DB_USERNAME}
+  password: ${oc.env:DB_PASSWORD}
+  host: ${oc.env:DB_HOST}
+  port: ${oc.env:DB_PORT}
+  name: ${oc.env:DB_NAME}

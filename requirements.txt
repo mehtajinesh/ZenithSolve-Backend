@@ -1,0 +1,5 @@
+fastapi
+sqlalchemy
+uvicorn
+omegaconf
+python_dotenv
