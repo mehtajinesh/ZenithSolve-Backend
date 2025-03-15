@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List
-from schemas.real_world_examples import RealWorldExample
-from schemas.solutions import Solution
+from app.schemas.real_world_examples import RealWorldExample
+from app.schemas.solutions import Solution
 class ProblemBase(BaseModel):
     title: str
     statement: str
@@ -18,4 +18,4 @@ class Problem(ProblemBase):
     solutions: List[Solution] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

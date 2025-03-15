@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Text, String, ForeignKey
 from sqlalchemy.orm import relationship
-from db.database import Base
+from app.db.database import Base
 
 class RealWorldExample(Base):
     __tablename__ = 'real_world_examples'

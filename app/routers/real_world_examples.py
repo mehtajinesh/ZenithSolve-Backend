@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from db.utils import get_db
-from schemas.real_world_examples import RealWorldExample, RealWorldExampleCreate
-from crud import real_world_examples 
+from app.db.utils import get_db
+from app.schemas.real_world_examples import RealWorldExample, RealWorldExampleCreate
+from app.crud import real_world_examples 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 

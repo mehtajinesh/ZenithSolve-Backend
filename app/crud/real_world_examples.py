@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-import db.models.real_world_example as models
-import schemas.real_world_examples as schemas
+import app.db.models.real_world_example as models
+import app.schemas.real_world_examples as schemas
 
 def get_real_world_example(db: Session, example_id: int):
     return db.query(models.RealWorldExample).filter(models.RealWorldExample.id == example_id).first()

@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from schemas.categories import Category, CategoryCreate
-from db.utils import get_db
-from crud import categories
+from app.schemas.categories import Category, CategoryCreate
+from app.db.utils import get_db
+from app.crud import categories
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 router = APIRouter()

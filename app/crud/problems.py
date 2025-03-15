@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-import db.models.problem as models
-import schemas.problems as schemas
+import app.db.models.problem as models
+import app.schemas.problems as schemas
 
 def get_problem(db: Session, problem_id: int):
     return db.query(models.Problem).filter(models.Problem.id == problem_id).first()

@@ -1,6 +1,6 @@
 # Python virtual environment
 # Ignore Python virtual environments
-venv
+env
 
 # Ignore macoS system files
 .DS_Store

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import List
-from schemas.problems import Problem
+from app.schemas.problems import Problem
 
 
 class CategoryBase(BaseModel):
@@ -14,4 +14,4 @@ class Category(CategoryBase):
     problems: List[Problem] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

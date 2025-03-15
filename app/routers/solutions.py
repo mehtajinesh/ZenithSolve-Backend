@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-from db.utils import get_db
-from schemas.solutions import SolutionCreate, Solution
-from crud import solutions
+from app.db.utils import get_db
+from app.schemas.solutions import SolutionCreate, Solution
+from app.crud import solutions
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 router = APIRouter()

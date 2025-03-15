@@ -1,8 +1,8 @@
-from db.database import SessionLocal, Base, engine
-from db.models.category import Category
-from db.models.problem import Problem
-from db.models.real_world_example import RealWorldExample
-from db.models.solution import Solution
+from app.db.database import SessionLocal, Base, engine
+from app.db.models.category import Category
+from app.db.models.problem import Problem
+from app.db.models.real_world_example import RealWorldExample
+from app.db.models.solution import Solution
 def get_db():
     db = SessionLocal()
     try:
