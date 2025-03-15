@@ -15,5 +15,5 @@ __pycache__/
 .coverage
 
 .pytest_cache/
-
+htmlcov/
 .ruff_cache/
