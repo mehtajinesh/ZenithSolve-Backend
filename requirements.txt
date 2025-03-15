@@ -1,5 +1,7 @@
 fastapi
 sqlalchemy
 uvicorn
+pydantic
 omegaconf
 python_dotenv
+psycopg2-binary

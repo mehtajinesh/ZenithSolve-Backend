@@ -1,10 +1,13 @@
 from fastapi import FastAPI
 import uvicorn
 from db.utils import init_db
-
+from routers import categories
 
 app = FastAPI()
 init_db()
+
+
+app.include_router(categories.router, prefix="/categories", tags=["categories"])
 
 @app.get("/")
 def read_root():
