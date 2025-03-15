@@ -32,7 +32,6 @@ def test_full_workflow(db: Session):
         "problem_id": problem_id
     })
     assert example_response.status_code == 200
-    example_id = example_response.json()["id"]
 
     # Create a solution
     solution_response = client.post("/solutions/", json={
@@ -43,7 +42,6 @@ def test_full_workflow(db: Session):
         "problem_id": problem_id
     })
     assert solution_response.status_code == 200
-    solution_id = solution_response.json()["id"]
 
     # Retrieve the problem with related examples and solutions
     problem_retrieve_response = client.get(f"/problems/{problem_id}")
