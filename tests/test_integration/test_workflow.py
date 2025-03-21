@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from app.schemas.problems import ProblemIn, ExampleItem
-from app.schemas.categories import CategoryIn
+from app.schemas.categories import Category
 import uuid
 from unittest.mock import MagicMock, ANY
 
@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, ANY
 def test_workflow(client: TestClient, mock_db):
     # Step 1: Create a new category
     unique_category_name = f"Test Category {uuid.uuid4()}"
-    category_in = CategoryIn(name=unique_category_name)
+    category_in = Category(name=unique_category_name)
     category_id = 1  # Using integer ID
 
     # Setup mock behavior for category operations
@@ -25,7 +25,6 @@ def test_workflow(client: TestClient, mock_db):
     assert created_category.status_code == 201
     created_category_json = created_category.json()
     assert created_category_json["name"] == unique_category_name
-    assert created_category_json["id"] == category_id
 
     # Step 2: Create a new problem associated with the created category
     unique_problem_slug = f"test-problem-{uuid.uuid4()}"

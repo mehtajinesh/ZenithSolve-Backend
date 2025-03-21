@@ -22,6 +22,7 @@ class ProblemIn(BaseModel):
     difficulty: ProblemDifficultyEnum = Field(..., description="Difficulty of the problem [Easy, Medium, Hard]")
     categories: List[str] = Field(default=[], description="List of categories associated with the problem")
     description: str = Field(..., description="Detailed description of the problem")
+    constraints: List[str] = Field(default=[], description="List of constraints for the problem")
     examples: List[ExampleItem] = Field(..., description="List of example inputs and outputs for the problem")
 
     class Config:

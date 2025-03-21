@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.schemas.categories import CategoryIn, CategoryOut
+from app.schemas.categories import Category
 from app.db.utils import get_db
 from app.crud import categories
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -10,9 +10,9 @@ from app.extras import format_response
 
 router = APIRouter()
 
-@format_response(CategoryOut)
-@router.post("/categories/", response_model=CategoryOut, status_code=status.HTTP_201_CREATED)
-def create_category(category: CategoryIn, db: Session = Depends(get_db)):
+@format_response(Category)
+@router.post("/categories/", response_model=Category, status_code=status.HTTP_201_CREATED)
+def create_category(category: Category, db: Session = Depends(get_db)):
     """
     Creates a new category in the database.
 
@@ -50,8 +50,8 @@ def create_category(category: CategoryIn, db: Session = Depends(get_db)):
     
 
 
-@format_response(List[CategoryOut])
-@router.get("/categories/", response_model=List[CategoryOut])
+@format_response(List[str])
+@router.get("/categories/", response_model=List[str])
 def read_categories(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """
     Retrieves a list of categories from the database using pagination.

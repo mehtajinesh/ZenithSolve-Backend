@@ -4,6 +4,37 @@ from app.db.models.problem import Problem
 from app.db.models.category import Category
 import app.schemas.problems as schemas
 
+def get_problems(db: Session, skip: int = 0, limit: int = 10):
+    """
+    Retrieves a list of problems from the database using pagination.
+
+    Parameters:
+        db (Session): The database session.
+        skip (int): The number of problems to skip from the beginning of the query results. Must be non-negative.
+        limit (int): The maximum number of problems to return. Must be positive.
+
+    Returns:
+        List[schemas.ProblemOut]: A list of problem objects.
+    """
+    if skip < 0 or limit <= 0:
+        raise ValueError("Invalid pagination parameters")
+    
+    problems = db.query(Problem).offset(skip).limit(limit).all()
+    return [schemas.ProblemOut(
+        slug_id=problem.slug_id,
+        title=problem.title,
+        difficulty=problem.difficulty,
+        description=problem.description,
+        constraints=problem.constraints,
+        examples=json.loads(problem.examples) if problem.examples else [],
+        categories=[cat.name for cat in problem.categories] if problem.categories else [],
+        solution_approach=problem.solution_approach,
+        best_time_complexity=problem.best_time_complexity,
+        best_space_complexity=problem.best_space_complexity,
+        solutions=problem.solutions,
+        real_world_applications=problem.real_world_examples
+    ) for problem in problems]
+
 def get_problem(db: Session, slug_id: str):
     # check if problem with the given slug_id exists
     problem = db.query(Problem).filter(Problem.slug_id == slug_id).first() 
@@ -14,6 +45,7 @@ def get_problem(db: Session, slug_id: str):
         "title": problem.title,
         "difficulty": problem.difficulty,
         "description": problem.description,
+        "constraints": problem.constraints,
         "examples": [schemas.ExampleItem(**example) for example in json.loads(problem.examples)] if problem.examples else [],
         "categories": [cat.name for cat in problem.categories] if problem.categories else [],
         "solution_approach": problem.solution_approach,
@@ -51,6 +83,7 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
         title=problem.title,
         difficulty=problem.difficulty,
         description=problem.description,
+        constraints=problem.constraints,
         examples=json_examples
     )
     
@@ -63,6 +96,7 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
         "title": db_problem.title,
         "difficulty": db_problem.difficulty,
         "description": db_problem.description,
+        "constraints": db_problem.constraints,
         "examples": problem.examples,
         "categories": problem.categories,
         "solution_approach": "",

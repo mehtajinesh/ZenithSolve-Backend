@@ -1,7 +1,7 @@
 # tests/test_crud/test_categories.py
 from sqlalchemy.orm import Session
 from app.crud import categories
-from app.schemas.categories import CategoryIn
+from app.schemas.categories import Category
 from app.db.models.category import Category
 import uuid
 from unittest.mock import MagicMock
@@ -17,7 +17,7 @@ def test_create_category_existing(mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = mock_existing_category
     
     # Attempt to create a category that already exists
-    category_in = CategoryIn(name=unique_name)
+    category_in = Category(name=unique_name)
     
     with pytest.raises(Exception, match="Category already exists"):
         categories.create_category(db=mock_db, category=category_in)
@@ -30,7 +30,7 @@ def test_create_category_new(mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = None  # No existing category
     
     # Create a new category
-    category_in = CategoryIn(name=unique_name)
+    category_in = Category(name=unique_name)
     
     # Mock the behavior of adding and committing to the database
     mock_db.add = MagicMock()
@@ -58,5 +58,5 @@ def test_get_categories(mock_db):
     
     # Check that the retrieved categories match the mocked ones
     assert len(categories_list) == 4
-    assert all(cat.name.startswith("Category") for cat in categories_list)
-    assert all(isinstance(cat, Category) for cat in categories_list)
+    assert all(cat.startswith("Category") for cat in categories_list)
+    assert all(isinstance(cat, str) for cat in categories_list)

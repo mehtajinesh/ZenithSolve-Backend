@@ -17,9 +17,11 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10):
     Returns:
         List[models.Category]: A list of category objects retrieved from the database.
     """
-    return db.query(models.Category).offset(skip).limit(limit).all()
+    categories = db.query(models.Category).offset(skip).limit(limit).all()
+    categories_names = [category.name for category in categories]
+    return sorted(categories_names)
 
-def create_category(db: Session, category: schemas.CategoryIn):
+def create_category(db: Session, category: schemas.Category):
     """
     Create a new category in the database, handling the case where the category already exists.
 
@@ -29,7 +31,7 @@ def create_category(db: Session, category: schemas.CategoryIn):
 
     Args:
         db (Session): The SQLAlchemy session object used for database transactions.
-        category (schemas.CategoryCreate): The data schema containing the necessary fields
+        category (schemas.Category): The data schema containing the necessary fields
             for creating a new category (e.g., name).
 
     Returns:

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, Table
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, Table, ARRAY
 from sqlalchemy.orm import relationship
 from app.db.database import Base
 
@@ -16,9 +16,10 @@ class Problem(Base):
     id = Column(Integer, primary_key=True, index=True)
     slug_id = Column(String, unique=True, index=True)  # For URL-friendly ID like 'two-sum'
     title = Column(String, index=True)
-    difficulty = Column(Integer)
+    difficulty = Column(String)
     categories = relationship('Category', secondary=problem_category, back_populates='problems')
     description = Column(Text)
+    constraints = Column(ARRAY(String), default=[])
     examples = Column(Text)
     solution_approach = Column(Text, default="")
     best_time_complexity = Column(String, default="NA")
