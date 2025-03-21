@@ -19,7 +19,7 @@ def get_categories(db: Session, skip: int = 0, limit: int = 10):
     """
     return db.query(models.Category).offset(skip).limit(limit).all()
 
-def create_category(db: Session, category: schemas.CategoryCreate):
+def create_category(db: Session, category: schemas.CategoryIn):
     """
     Create a new category in the database, handling the case where the category already exists.
 

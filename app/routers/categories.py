@@ -2,16 +2,17 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.schemas.categories import Category, CategoryCreate
+from app.schemas.categories import CategoryIn, CategoryOut
 from app.db.utils import get_db
 from app.crud import categories
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from app.extras import format_response
 
 router = APIRouter()
 
-
-@router.post("/categories/", response_model=Category)
-def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
+@format_response(CategoryOut)
+@router.post("/categories/", response_model=CategoryOut)
+def create_category(category: CategoryIn, db: Session = Depends(get_db)):
     """
     Creates a new category in the database.
 
@@ -47,7 +48,8 @@ def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
     except Exception as err:
         raise HTTPException(status_code=500, detail="An unexpected error occurred") from err
 
-@router.get("/categories/", response_model=List[Category])
+@format_response(List[CategoryOut])
+@router.get("/categories/", response_model=List[CategoryOut])
 def read_categories(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     """
     Retrieves a list of categories from the database using pagination.
