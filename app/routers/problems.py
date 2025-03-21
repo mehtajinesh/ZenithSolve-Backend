@@ -1,15 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Dict, Any
+import json
 from app.db.utils import get_db
-from app.schemas.problems import Problem, ProblemCreate
+from app.schemas.problems import ProblemIn, ProblemOut
 from app.crud import problems
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from app.extras import format_response
+
 
 router = APIRouter()
 
-@router.post("/problems/", response_model=Problem)
-def create_problem(problem: ProblemCreate, db: Session = Depends(get_db)):
+@format_response(ProblemOut)
+@router.post("/problems/", response_model=ProblemOut)
+def create_problem(problem: ProblemIn, db: Session = Depends(get_db)):
     try:
         created_problem = problems.create_problem(db=db, problem=problem)
         return created_problem
@@ -23,21 +27,8 @@ def create_problem(problem: ProblemCreate, db: Session = Depends(get_db)):
         # Catch-all for any other errors.
         raise HTTPException(status_code=500, detail="Unexpected error: " + str(ex))
 
-@router.get("/problems/", response_model=List[Problem])
-def read_problems(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    if skip < 0 or limit < 0:
-        raise HTTPException(status_code=400, detail="Negative numbers are not allowed for skip or limit")
-    try:
-        retrieved_problems = problems.get_problems(db, skip=skip, limit=limit)
-        return retrieved_problems
-    except SQLAlchemyError as se:
-        raise HTTPException(status_code=500, detail="Database error: " + str(se))
-    except Exception as ex:
-        raise HTTPException(status_code=500, detail="Unexpected error: " + str(ex))
-
-@router.get("/problems/{problem_id}", response_model=Problem)
-def read_problem(problem_id: int, db: Session = Depends(get_db)):
-    db_problem = problems.get_problem(db, problem_id=problem_id)
-    if db_problem is None:
-        raise HTTPException(status_code=404, detail="Problem not found")
+@format_response(ProblemOut)
+@router.get("/problems/{problem_id}", response_model=ProblemOut)
+def read_problem(problem_id: str, db: Session = Depends(get_db)):
+    db_problem = problems.get_problem(db, slug_id=problem_id)
     return db_problem

@@ -41,12 +41,14 @@ def create_category(category: CategoryIn, db: Session = Depends(get_db)):
         return new_category
     except IntegrityError as err:
         db.rollback()
-        raise HTTPException(status_code=400, detail="Category creation failed due to integrity constraints") from err
+        raise HTTPException(status_code=400, detail="Category with this name already exists") from err
     except SQLAlchemyError as err:
         db.rollback()
         raise HTTPException(status_code=500, detail="A database error occurred during category creation") from err
     except Exception as err:
-        raise HTTPException(status_code=500, detail="An unexpected error occurred") from err
+        raise HTTPException(status_code=500, detail="An unexpected error occurred during category creation") from err
+    
+
 
 @format_response(List[CategoryOut])
 @router.get("/categories/", response_model=List[CategoryOut])
