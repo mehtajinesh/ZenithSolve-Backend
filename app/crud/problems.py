@@ -14,7 +14,7 @@ def get_problem(db: Session, slug_id: str):
         "title": problem.title,
         "difficulty": problem.difficulty,
         "description": problem.description,
-        "examples": json.loads(problem.examples) if problem.examples else [],
+        "examples": [schemas.ExampleItem(**example) for example in json.loads(problem.examples)] if problem.examples else [],
         "categories": [cat.name for cat in problem.categories] if problem.categories else [],
         "solution_approach": problem.solution_approach,
         "best_time_complexity": problem.best_time_complexity,
@@ -65,9 +65,9 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
         "description": db_problem.description,
         "examples": problem.examples,
         "categories": problem.categories,
-        "solution_approach": db_problem.solution_approach,
-        "best_time_complexity": db_problem.best_time_complexity,
-        "best_space_complexity": db_problem.best_space_complexity,
+        "solution_approach": "",
+        "best_time_complexity": "NA",
+        "best_space_complexity": "NA",
         "solutions": [],
         "real_world_applications": []
     }

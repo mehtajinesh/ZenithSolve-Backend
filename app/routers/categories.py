@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -11,7 +11,7 @@ from app.extras import format_response
 router = APIRouter()
 
 @format_response(CategoryOut)
-@router.post("/categories/", response_model=CategoryOut)
+@router.post("/categories/", response_model=CategoryOut, status_code=status.HTTP_201_CREATED)
 def create_category(category: CategoryIn, db: Session = Depends(get_db)):
     """
     Creates a new category in the database.

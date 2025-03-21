@@ -37,9 +37,9 @@ class ProblemIn(BaseModel):
         return [example.__dict__ for example in self.examples] if self.examples else []
 
 class ProblemOut(ProblemIn):
-    solution_approach: str = Field(..., description="Approach to solve the problem")
-    best_time_complexity: str = Field(..., description="Best time complexity of the solution")
-    best_space_complexity: str = Field(..., description="Best space complexity of the solution")
+    solution_approach: str = Field(description="Approach to solve the problem")
+    best_time_complexity: str = Field(description="Best time complexity of the solution")
+    best_space_complexity: str = Field(description="Best space complexity of the solution")
     solutions: List[Solution] = Field(default=[], description="List of solutions for the problem")
     real_world_applications: List[RealWorldExample] = Field(default=[], description="List of real-world applications of the problem")
     

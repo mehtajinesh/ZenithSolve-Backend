@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 import json
@@ -8,11 +8,10 @@ from app.crud import problems
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app.extras import format_response
 
-
 router = APIRouter()
 
 @format_response(ProblemOut)
-@router.post("/problems/", response_model=ProblemOut)
+@router.post("/problems/", response_model=ProblemOut, status_code=status.HTTP_201_CREATED)
 def create_problem(problem: ProblemIn, db: Session = Depends(get_db)):
     try:
         created_problem = problems.create_problem(db=db, problem=problem)
