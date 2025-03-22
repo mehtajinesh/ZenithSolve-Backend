@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 import json
 from app.db.utils import get_db
 from app.schemas.problems import ProblemIn, ProblemOut
+from app.schemas.solutions import Solution
 from app.crud import problems
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app.extras import format_response
@@ -47,3 +48,28 @@ def read_problems(skip: int = 0, limit: int = 200, db: Session = Depends(get_db)
     
     problems_list = problems.get_problems(db, skip=skip, limit=limit)
     return problems_list
+
+# need a route to handle additing solutions to a problem
+@format_response(Solution)
+@router.post("/problems/{problem_id}/solutions", response_model=Solution,status_code=status.HTTP_201_CREATED)
+def add_solution(problem_id: str, solution: Solution, db: Session = Depends(get_db)):
+    """
+    Adds a solution to a specific problem.
+
+    Parameters:
+        problem_id (str): The ID of the problem to which the solution will be added.
+        solution (Solution): The solution data to be added.
+        db (Session): The database session provided by Depends(get_db).
+
+    Returns:
+        SolutionOut: The newly created solution object.
+
+    Raises:
+        HTTPException: If the problem does not exist or if there is a database error.
+    """
+    try:        
+        # Add the solution to the problem
+        created_solution = problems.add_solution_to_problem(db=db, problem_id=problem_id, solution=solution)
+        return created_solution
+    except SQLAlchemyError as se:
+        raise HTTPException(status_code=500, detail="Database error: " + str(se))

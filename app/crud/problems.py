@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
 import json
 from app.db.models.problem import Problem
+from app.db.models.solution import Solution
 from app.db.models.category import Category
 import app.schemas.problems as schemas
+from app.extras import compare_approaches
 
 def get_problems(db: Session, skip: int = 0, limit: int = 10):
     """
@@ -26,13 +28,12 @@ def get_problems(db: Session, skip: int = 0, limit: int = 10):
         difficulty=problem.difficulty,
         description=problem.description,
         constraints=problem.constraints,
-        examples=json.loads(problem.examples) if problem.examples else [],
+        examples= [schemas.ExampleItem(**example) for example in json.loads(problem.examples)] if problem.examples else [],
         categories=[cat.name for cat in problem.categories] if problem.categories else [],
-        solution_approach=problem.solution_approach,
         best_time_complexity=problem.best_time_complexity,
         best_space_complexity=problem.best_space_complexity,
-        solutions=problem.solutions,
-        real_world_applications=problem.real_world_examples
+        solutions=[schemas.Solution(**solution.__dict__) for solution in problem.solutions] if problem.solutions else [],
+        real_world_applications=[schemas.RealWorldExample(**example.__dict__) for example in problem.real_world_examples] if problem.real_world_examples else []
     ) for problem in problems]
 
 def get_problem(db: Session, slug_id: str):
@@ -48,11 +49,10 @@ def get_problem(db: Session, slug_id: str):
         "constraints": problem.constraints,
         "examples": [schemas.ExampleItem(**example) for example in json.loads(problem.examples)] if problem.examples else [],
         "categories": [cat.name for cat in problem.categories] if problem.categories else [],
-        "solution_approach": problem.solution_approach,
         "best_time_complexity": problem.best_time_complexity,
         "best_space_complexity": problem.best_space_complexity,
-        "solutions": problem.solutions,
-        "real_world_applications": problem.real_world_examples
+        "solutions": [schemas.Solution(**solution.__dict__) for solution in problem.solutions] if problem.solutions else [],
+        "real_world_applications": [schemas.RealWorldExample(**example.__dict__) for example in problem.real_world_examples] if problem.real_world_examples else []
     }
     return schemas.ProblemOut(**problem_out)
 
@@ -99,7 +99,6 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
         "constraints": db_problem.constraints,
         "examples": problem.examples,
         "categories": problem.categories,
-        "solution_approach": "",
         "best_time_complexity": "NA",
         "best_space_complexity": "NA",
         "solutions": [],
@@ -128,3 +127,30 @@ def update_problem(db: Session, problem_id: int, problem_update: schemas.Problem
     db.commit()
     db.refresh(db_problem)
     return db_problem
+
+def add_solution_to_problem(db: Session, problem_id: int, solution: schemas.Solution):
+    problem = db.query(Problem).filter(Problem.slug_id == problem_id).first() 
+    if not problem:
+        raise ValueError(f"Problem with slug_id '{problem_id}' not found.")
+    # Add the solution to the db and link it to the problem
+    solution = Solution( name=solution.name,
+                        code=solution.code,
+                        description=solution.description,
+                        time_complexity=solution.time_complexity,
+                        space_complexity=solution.space_complexity,
+                        problem_id=problem.id)
+    db.add(solution)
+    db.commit()
+    db.refresh(solution)
+
+    # Update the problem's best time and space complexity if the new solution is better
+    problem.best_time_complexity, problem.best_space_complexity = compare_approaches(solution.time_complexity, solution.space_complexity, problem.best_time_complexity, problem.best_space_complexity)
+    db.commit()
+    solution_op = {
+        "name": solution.name,
+        "code": solution.code,
+        "description": solution.description,
+        "time_complexity": solution.time_complexity,
+        "space_complexity": solution.space_complexity,
+    }
+    return schemas.Solution(**solution_op)

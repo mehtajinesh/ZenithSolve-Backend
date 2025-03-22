@@ -21,7 +21,6 @@ class Problem(Base):
     description = Column(Text)
     constraints = Column(ARRAY(String), default=[])
     examples = Column(Text)
-    solution_approach = Column(Text, default="")
     best_time_complexity = Column(String, default="NA")
     best_space_complexity = Column(String, default="NA")
     real_world_examples = relationship('RealWorldExample', back_populates='problem')

@@ -8,7 +8,6 @@ class Solution(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)  # Name of the approach (e.g., "Hash Table Approach")
     description = Column(Text)  # Description of the approach
-    language = Column(String)  # Programming language (e.g., "Python")
     code = Column(Text)
     time_complexity = Column(String)
     space_complexity = Column(String)

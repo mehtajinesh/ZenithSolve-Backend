@@ -2,6 +2,7 @@
 import uuid
 from app.schemas.problems import ProblemIn, ExampleItem
 from app.db.models.problem import Problem
+from app.db.models.category import Category
 from app.crud import problems
 import pytest
 from unittest.mock import MagicMock
@@ -103,17 +104,18 @@ def test_get_problem_existing(mock_db):
     # Mock existing problem
     unique_slug = f"test-problem-{uuid.uuid4()}"
     mock_problem = Problem(
-        title="Existing Problem",
+        id=1,
         slug_id=unique_slug,
+        title="Existing Problem",
         difficulty="Medium",
         description="Existing Description",
+        categories=[Category(name="Test Category")],
+        constraints=["1 <= input <= 100"],
         examples='[{"input": "[1, 2]","output": "3","explanation": "1 + 2 = 3"}]',
-        solution_approach = "",
         best_time_complexity = "NA",
         best_space_complexity = "NA",
         real_world_examples=[],
         solutions = [],
-        id=1
     )
     
     # Setup mock behavior for existing problem
@@ -126,6 +128,11 @@ def test_get_problem_existing(mock_db):
     assert retrieved_problem.slug_id == unique_slug
     assert retrieved_problem.title == "Existing Problem"
     assert retrieved_problem.difficulty == "Medium"
+    assert retrieved_problem.constraints == ["1 <= input <= 100"]
+    assert retrieved_problem.best_time_complexity == "NA"
+    assert retrieved_problem.best_space_complexity == "NA"
+    assert retrieved_problem.solutions == []
     assert retrieved_problem.description == "Existing Description"
     assert len(retrieved_problem.examples) == 1
     assert retrieved_problem.examples[0].input == "[1, 2]"
+    

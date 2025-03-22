@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Union
 from app.schemas.real_world_examples import RealWorldExample
 from app.schemas.solutions import Solution
 from pydantic import Field
@@ -38,11 +38,10 @@ class ProblemIn(BaseModel):
         return [example.__dict__ for example in self.examples] if self.examples else []
 
 class ProblemOut(ProblemIn):
-    solution_approach: str = Field(description="Approach to solve the problem")
     best_time_complexity: str = Field(description="Best time complexity of the solution")
     best_space_complexity: str = Field(description="Best space complexity of the solution")
-    solutions: List[Solution] = Field(default=[], description="List of solutions for the problem")
-    real_world_applications: List[RealWorldExample] = Field(default=[], description="List of real-world applications of the problem")
+    solutions: Union[List[Solution], None] = Field(default=[], description="List of solutions for the problem")
+    real_world_applications: Union[List[RealWorldExample], None]= Field(default=[], description="List of real-world applications of the problem")
     
     class Config:
         from_attributes = True

@@ -1,17 +1,8 @@
 from pydantic import BaseModel
 
-class SolutionBase(BaseModel):
-    language: str
+class Solution(BaseModel):
+    name: str
+    description: str
     code: str
     time_complexity: str
     space_complexity: str
-    problem_id: int
-
-class SolutionCreate(SolutionBase):
-    pass
-
-class Solution(SolutionBase):
-    id: int
-
-    class Config:
-        from_attributes = True
