@@ -40,10 +40,6 @@ def create_category(db: Session, category: schemas.Category):
     Raises:
         Exception: If a category with the specified name already exists.
     """
-    existing_category = db.query(models.Category).filter(models.Category.name == category.name).first()
-    if existing_category:
-        raise Exception("Category already exists")
-    
     db_category = models.Category(name=category.name)
     db.add(db_category)
     db.commit()
