@@ -30,6 +30,4 @@ if __name__ == "__main__":
         app,
         host="0.0.0.0",
         port=8000,
-        ssl_certfile="cert/0.0.0.0.pem",
-        ssl_keyfile="cert/0.0.0.0-key.pem",
     )
