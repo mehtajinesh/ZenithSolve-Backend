@@ -17,3 +17,6 @@ __pycache__/
 .pytest_cache/
 htmlcov/
 .ruff_cache/
+
+# Ignore certificate files
+/cert
