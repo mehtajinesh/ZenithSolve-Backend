@@ -1,18 +1,23 @@
 services:
-  web:
-    build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+  backend:
+    image: python:3.11
+    container_name: zenith_backend
+    working_dir: /app
     volumes:
-      - .:/app
+      - ./:/app
     ports:
       - "8000:8000"
+    command: sh -c "pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     env_file: .env
+    depends_on:
+      - db
 
   db:
+    container_name: zenith_db
     image: postgres:17
     env_file: .env
+    restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
+      - postgres_data:/var/lib/postgresql@17/data
 volumes:
   postgres_data:
