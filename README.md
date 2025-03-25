@@ -89,12 +89,12 @@ The Makefile provides various commands for local testing, running code, linting,
 ## Docker Instructions
 1. **Build the Docker image**:
     ```bash
-    docker build -t zenithsolve-backend .
+    docker build -t zenithsolve-backend . --no-cache
     ```
 
 2. **Run the Docker container**:
     ```bash
-    docker-compose up --build
+    docker run --network host -p 8000:8000 zenithsolve-backend
     ```
 
 ## Swagger UI
