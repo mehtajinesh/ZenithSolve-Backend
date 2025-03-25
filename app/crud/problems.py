@@ -76,12 +76,12 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
                 raise ValueError("Invalid example schema provided.")
     
     json_examples = json.dumps([example.__dict__ for example in problem.examples])
-    
     # Create new problem with data from schema
     db_problem = Problem(
         slug_id=problem.slug_id,
         title=problem.title,
         difficulty=problem.difficulty,
+        categories=categories,
         description=problem.description,
         constraints=problem.constraints,
         examples=json_examples
