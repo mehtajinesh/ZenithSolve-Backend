@@ -1,19 +1,9 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from app.db.utils import init_db
 from app.routers import categories, problems
 
 app = FastAPI()
-
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
-)
 
 init_db()
 app.include_router(categories.router)
@@ -29,7 +19,5 @@ if __name__ == "__main__":
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8000,
-        ssl_certfile="cert/0.0.0.0.pem",
-        ssl_keyfile="cert/0.0.0.0-key.pem",
+        port=8000
     )
