@@ -14,10 +14,10 @@ services:
 
   db:
     container_name: zenith_db
-    image: postgres:13
+    image: postgres:17
     env_file: .env
     restart: always
     volumes:
-      - postgres_data:/var/lib/postgresql@13/data
+      - postgres_data:/var/lib/postgresql@17/data
 volumes:
   postgres_data:
