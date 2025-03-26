@@ -335,7 +335,7 @@ def delete_problem(problem_id: str, db: Session = Depends(get_db)):
             }
         ) from err
 
-@router.delete("/problems/{problem_id}/solutions/")
+@router.delete("/problems/{problem_id}/solutions/{solution_name}")
 def delete_solution(problem_id: str, solution_name: str, db: Session = Depends(get_db)):
     """
     Deletes a specific solution from a problem.
@@ -391,7 +391,7 @@ def delete_solution(problem_id: str, solution_name: str, db: Session = Depends(g
         ) from err
 
 @format_response(Solution)
-@router.put("/problems/{problem_id}/solutions/", response_model=Solution)
+@router.put("/problems/{problem_id}/solutions/{solution_name}", response_model=Solution)
 def update_solution(problem_id: str, solution_name: str, solution: Solution, db: Session = Depends(get_db)):
     """
     Updates a specific solution for a problem.
