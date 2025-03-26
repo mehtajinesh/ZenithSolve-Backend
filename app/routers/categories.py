@@ -136,3 +136,128 @@ def read_categories(skip: int = 0, limit: int = 10, db: Session = Depends(get_db
                 "error": str(err)
             }
         ) from err
+
+@format_response(Category)
+@router.put("/categories/", response_model=Category)
+def update_category(
+    old_category: Category, new_category: Category, db: Session = Depends(get_db)
+):
+    """
+    Updates an existing category in the database.
+
+    This function updates a category name. It checks if the category exists and
+    updates its fields with the provided data.
+
+    Parameters:
+        old_category (Category): The old name of the category to update.
+        new_category (Category): The new data for the category.
+        db (Session): The database session.
+
+    Returns:
+        Category: The updated category object.
+
+    Raises:
+        HTTPException: 
+            - 404: If the category does not exist
+            - 422: If validation fails
+            - 500: If a database or unexpected error occurs
+    """
+    try:
+        updated_category = categories.update_category(db=db, old_category=old_category, new_category=new_category)
+        return updated_category
+    except IntegrityError as err:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "message": "Category with this name already exists",
+                "error": str(err)
+            }
+        ) from err
+    except SQLAlchemyError as err:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "Database error occurred during category update",
+                "error": str(err)
+            }
+        ) from err
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "message": "Invalid data provided",
+                "error": str(err)
+            }
+        ) from err
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "An unexpected error occurred during category update",
+                "error": str(err)
+            }
+        ) from err
+
+@format_response(bool)
+@router.delete("/categories/", response_model=bool)
+def delete_category(
+    category: Category, db: Session = Depends(get_db)
+):
+    """
+    Deletes a category from the database.
+
+    This function deletes a category by its name. It checks if the category exists and
+    deletes it from the database.
+
+    Parameters:
+        category (Category): The name of the category to delete.
+        db (Session): The database session.
+
+    Returns:
+        bool: True if the deletion was successful, False otherwise.
+
+    Raises:
+        HTTPException: 
+            - 404: If the category does not exist
+            - 422: If validation fails
+            - 500: If a database or unexpected error occurs
+    """
+    try:
+        deleted = categories.delete_category(db=db, category=category)
+        return deleted
+    except IntegrityError as err:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={
+                "message": "Database integrity error occurred",
+                "error": str(err)
+            }
+        ) from err
+    except SQLAlchemyError as err:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "Database error occurred during category deletion",
+                "error": str(err)
+            }
+        ) from err
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "message": "Invalid data provided",
+                "error": str(err)
+            }
+        ) from err
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "An unexpected error occurred during category deletion",
+                "error": str(err)
+            }
+        ) from err

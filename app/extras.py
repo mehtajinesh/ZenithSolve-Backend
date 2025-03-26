@@ -28,10 +28,12 @@ def parse_complexity(complexity):
     complexity = complexity.replace(" ", "")
     # Handle n^k, log(n), n!, 2^n, etc.
     if re.match(r"O\(n\^\d+\)", complexity):
-        base, exp = "n", int(re.search(r"\d+", complexity).group())
+        _, exp = "n", int(re.search(r"\d+", complexity).group())
         return ("polynomial", exp)
-    elif re.match(r"O\(logn\)", complexity):
+    elif re.match(r"O\(log\(n\)\)", complexity):
         return ("logarithmic", 1)
+    elif re.match(r"O\(nlog\(n\)\)", complexity):
+        return ("linearithmic", 1)
     elif re.match(r"O\(n!\)", complexity):
         return ("factorial", math.factorial)
     elif re.match(r"O\(2\^n\)", complexity):
@@ -48,10 +50,11 @@ def complexity_rank(complexity):
     ranks = {
         "constant": 0,
         "logarithmic": 1,
-        "linear": 2,
-        "polynomial": 3,
-        "exponential": 4,
-        "factorial": 5
+        "linearithmic": 2,
+        "linear": 3,
+        "polynomial": 4,
+        "exponential": 5,
+        "factorial": 6
     }
     return ranks.get(complexity[0], float('inf'))
 

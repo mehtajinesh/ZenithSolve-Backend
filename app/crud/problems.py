@@ -106,32 +106,14 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
     }
     return schemas.ProblemOut(**problem_out)
 
-def update_problem(db: Session, problem_id: int, problem_update: schemas.ProblemIn):
-    db_problem = get_problem(db, problem_id=problem_id)
-    if not db_problem:
-        return None
-    
-    # Update scalar attributes
-    for key, value in problem_update.dict(exclude={'category_ids', 'examples'}).items():
-        setattr(db_problem, key, value)
-    
-    # Convert examples list to JSON string for storage
-    if problem_update.examples:
-        db_problem.examples = json.dumps([example.dict() for example in problem_update.examples])
-    
-    # Update categories if provided
-    if problem_update.categories:
-        categories = db.query(Category).filter(Category.id.in_(problem_update.categories)).all()
-        db_problem.categories = categories
-    
-    db.commit()
-    db.refresh(db_problem)
-    return db_problem
-
 def add_solution_to_problem(db: Session, problem_id: int, solution: schemas.Solution):
     problem = db.query(Problem).filter(Problem.slug_id == problem_id).first() 
     if not problem:
         raise ValueError(f"Problem with slug_id '{problem_id}' not found.")
+    # Check if the solution already exists
+    existing_solution = db.query(Solution).filter(Solution.name == solution.name, Solution.problem_id == problem.id).first()
+    if existing_solution:
+        raise ValueError(f"Solution with name '{solution.name}' already exists for problem '{problem_id}'.")
     # Add the solution to the db and link it to the problem
     solution = Solution( name=solution.name,
                         code=solution.code,
@@ -154,3 +136,92 @@ def add_solution_to_problem(db: Session, problem_id: int, solution: schemas.Solu
         "space_complexity": solution.space_complexity,
     }
     return schemas.Solution(**solution_op)
+
+def update_problem(db: Session, problem_id: int, problem_update: schemas.ProblemIn):
+    db_problem = db.query(Problem).filter(Problem.slug_id == problem_id).first()
+    # Check if the problem exists
+    if not db_problem:
+        raise ValueError(f"Problem with slug_id '{problem_id}' not found.")
+    # Check if categories exist
+    if problem_update.categories:
+        categories = db.query(Category).filter(Category.name.in_(problem_update.categories)).all()
+        if len(categories) != len(problem_update.categories):
+            raise ValueError("One or more categories do not exist.")
+    
+    # Update scalar attributes
+    for key, value in problem_update.__dict__.items():
+        if key in ["slug_id", "examples", "categories"]:
+            continue
+        setattr(db_problem, key, value)
+    
+    # Update the slug_id if it has changed
+    if problem_update.slug_id != db_problem.slug_id:
+        existing_problem = db.query(Problem).filter(Problem.slug_id == problem_update.slug_id).first()
+        if existing_problem:
+            raise ValueError(f"Problem with slug_id '{problem_update.slug_id}' already exists.")
+    
+    db_problem.slug_id = problem_update.slug_id
+
+    # Convert examples list to JSON string for storage
+    if problem_update.examples:
+        db_problem.examples = json.dumps([example.__dict__ for example in problem_update.examples])
+    
+    db_problem.categories = categories
+    
+    db.commit()
+    db.refresh(db_problem)
+
+    problem_op = {
+        "slug_id": db_problem.slug_id,
+        "title": db_problem.title,
+        "difficulty": db_problem.difficulty,
+        "description": db_problem.description,
+        "constraints": db_problem.constraints,
+        "examples": [schemas.ExampleItem(**example) for example in json.loads(db_problem.examples)] if db_problem.examples else [],
+        "categories": [cat.name for cat in db_problem.categories] if db_problem.categories else [],
+        "best_time_complexity": db_problem.best_time_complexity,
+        "best_space_complexity": db_problem.best_space_complexity,
+        "solutions": [schemas.Solution(**solution.__dict__) for solution in db_problem.solutions] if db_problem.solutions else [],
+        "real_world_applications": [schemas.RealWorldExample(**example.__dict__) for example in db_problem.real_world_examples] if db_problem.real_world_examples else []
+    }
+    return problem_op
+
+def delete_problem(db: Session, problem_id: int):
+    db_problem = db.query(Problem).filter(Problem.slug_id == problem_id).first()
+    if not db_problem:
+        raise ValueError(f"Problem with slug_id '{problem_id}' not found.")
+    db.delete(db_problem)
+    db.commit()
+    return db_problem
+
+def update_solution(db: Session, solution_name: str, problem_id: int, solution_update: schemas.Solution):
+    # Check if the problem exists
+    db_problem = db.query(Problem).filter(Problem.slug_id == problem_id).first()
+    if not db_problem:
+        raise ValueError(f"Problem with slug_id '{problem_id}' not found.")
+    # Check if the solution exists
+    db_solution = db.query(Solution).filter(Solution.name == solution_name, Solution.problem_id == db_problem.id).first()
+    if not db_solution:
+        raise ValueError(f"Solution with name '{solution_name}' not found in problem '{problem_id}'.")
+    # Update scalar attributes
+    for key, value in solution_update.__dict__.items():
+        setattr(db_solution, key, value)
+    
+    # Update the solution in the database
+    db.commit()
+    db.refresh(db_solution)
+    return db_solution
+
+def delete_solution(db: Session, solution_name: str, problem_id: int):
+    # Check if the problem exists
+    db_problem = db.query(Problem).filter(Problem.slug_id == problem_id).first()
+    if not db_problem:
+        raise ValueError(f"Problem with slug_id '{problem_id}' not found.")
+    # Check if the solution exists
+    db_solution = db.query(Solution).filter(Solution.name == solution_name, Solution.problem_id == db_problem.id).first()
+    if not db_solution:
+        raise ValueError(f"Solution with name '{solution_name}' not found in problem '{problem_id}'.")
+    # Delete the solution
+    db.delete(db_solution)
+    db.commit()
+    return db_solution

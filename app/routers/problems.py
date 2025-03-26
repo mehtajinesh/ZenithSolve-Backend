@@ -225,3 +225,224 @@ def add_solution(problem_id: str, solution: Solution, db: Session = Depends(get_
                 "error": str(err)
             }
         ) from err
+
+@format_response(ProblemOut)
+@router.put("/problems/{problem_id}", response_model=ProblemOut)
+def update_problem(problem_id: str, problem: ProblemIn, db: Session = Depends(get_db)):
+    """
+    Updates a specific problem by its ID.
+
+    Parameters:
+        problem_id (str): The ID of the problem to update
+        problem (ProblemIn): The updated problem data
+        db (Session): The database session
+
+    Returns:
+        ProblemOut: The updated problem
+
+    Raises:
+        HTTPException: 
+            - 404: If the problem is not found
+            - 422: If validation fails
+            - 500: If a database or unexpected error occurs
+    """
+    try:
+        updated_problem = problems.update_problem(db=db, problem_id=problem_id, problem_update=problem)
+        if not updated_problem:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "message": "Problem not found",
+                    "error": f"No problem found with id {problem_id}"
+                }
+            )
+        return updated_problem
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "message": "Invalid data provided",
+                "error": str(err)
+            }
+        ) from err
+    except SQLAlchemyError as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "Database error occurred while updating the problem",
+                "error": str(err)
+            }
+        ) from err
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "An unexpected error occurred while updating the problem",
+                "error": str(err)
+            }
+        ) from err
+
+@router.delete("/problems/{problem_id}")
+def delete_problem(problem_id: str, db: Session = Depends(get_db)):
+    """
+    Deletes a specific problem by its ID.
+
+    Parameters:
+        problem_id (str): The ID of the problem to delete
+        db (Session): The database session
+
+    Returns:
+        bool: True if the problem was deleted successfully
+    Raises:
+        HTTPException: 
+            - 404: If the problem is not found
+            - 422: If validation fails
+            - 500: If a database or unexpected error occurs
+    """
+    try:
+        deleted_problem = problems.delete_problem(db=db, problem_id=problem_id)
+        if not deleted_problem:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "message": "Problem not found",
+                    "error": f"No problem found with id {problem_id}"
+                }
+            )
+        return True
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "message": "Invalid data provided",
+                "error": str(err)
+            }
+        ) from err
+    except SQLAlchemyError as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "Database error occurred while deleting the problem",
+                "error": str(err)
+            }
+        ) from err
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "An unexpected error occurred while deleting the problem",
+                "error": str(err)
+            }
+        ) from err
+
+@router.delete("/problems/{problem_id}/solutions/")
+def delete_solution(problem_id: str, solution_name: str, db: Session = Depends(get_db)):
+    """
+    Deletes a specific solution from a problem.
+
+    Parameters:
+        problem_id (str): The ID of the problem
+        solution_name (str): The name of the solution to delete
+        db (Session): The database session
+
+    Returns:
+        bool: True if the solution was deleted successfully 
+
+    Raises:
+        HTTPException: 
+            - 404: If the problem or solution is not found
+            - 422: If validation fails
+            - 500: If a database or unexpected error occurs
+    """
+    try:
+        deleted_solution = problems.delete_solution(db=db, problem_id=problem_id, solution_name=solution_name)
+        if not deleted_solution:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "message": "Solution not found",
+                    "error": f"No solution found with name {solution_name} for problem {problem_id}"
+                }
+            )
+        return True
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "message": "Invalid data provided",
+                "error": str(err)
+            }
+        ) from err
+    except SQLAlchemyError as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "Database error occurred while deleting the solution",
+                "error": str(err)
+            }
+        ) from err
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "An unexpected error occurred while deleting the solution",
+                "error": str(err)
+            }
+        ) from err
+
+@format_response(Solution)
+@router.put("/problems/{problem_id}/solutions/", response_model=Solution)
+def update_solution(problem_id: str, solution_name: str, solution: Solution, db: Session = Depends(get_db)):
+    """
+    Updates a specific solution for a problem.
+
+    Parameters:
+        problem_id (str): The ID of the problem
+        solution_name (str): The name of the solution to update
+        solution (Solution): The updated solution data
+        db (Session): The database session
+
+    Returns:
+        Solution: The updated solution
+
+    Raises:
+        HTTPException: 
+            - 404: If the problem or solution is not found
+            - 422: If validation fails
+            - 500: If a database or unexpected error occurs
+    """
+    try:
+        updated_solution = problems.update_solution(db=db, problem_id=problem_id, solution_name=solution_name, solution_update=solution)
+        if not updated_solution:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail={
+                    "message": "Solution not found",
+                    "error": f"No solution found with name {solution_name} for problem {problem_id}"
+                }
+            )
+        return updated_solution
+    except ValueError as err:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={
+                "message": "Invalid data provided",
+                "error": str(err)
+            }
+        ) from err
+    except SQLAlchemyError as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "Database error occurred while updating the solution",
+                "error": str(err)
+            }
+        ) from err
+    except Exception as err:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "message": "An unexpected error occurred while updating the solution",
+                "error": str(err)
+            }
+        ) from err

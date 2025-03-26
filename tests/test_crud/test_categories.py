@@ -1,8 +1,6 @@
 # tests/test_crud/test_categories.py
-from sqlalchemy.orm import Session
 from app.crud import categories
 from app.schemas.categories import Category
-from app.db.models.category import Category
 import uuid
 from unittest.mock import MagicMock
 import pytest
@@ -60,3 +58,72 @@ def test_get_categories(mock_db):
     assert len(categories_list) == 4
     assert all(cat.startswith("Category") for cat in categories_list)
     assert all(isinstance(cat, str) for cat in categories_list)
+
+def test_update_category_existing(mock_db):
+    # Mock existing category
+    old_name = "Old Category"
+    new_name = "New Category"
+    mock_existing_category = Category(name=old_name, id=1)
+    
+    # Setup mock behavior for existing category
+    mock_db.query.return_value.filter.return_value.first.return_value = mock_existing_category
+    
+    # Create category schemas for update
+    old_category = Category(name=old_name)
+    new_category = Category(name=new_name)
+    
+    # Mock the behavior of committing and refreshing
+    mock_db.commit = MagicMock()
+    mock_db.refresh = MagicMock()
+    
+    # Update the category
+    updated_category = categories.update_category(db=mock_db, old_category=old_category, new_category=new_category)
+    
+    # Check that the category was updated correctly
+    assert updated_category.name == new_name
+    mock_db.commit.assert_called_once()
+    mock_db.refresh.assert_called_once_with(mock_existing_category)
+
+def test_update_category_not_found(mock_db):
+    # Setup mock behavior for non-existent category
+    mock_db.query.return_value.filter.return_value.first.return_value = None
+    
+    # Create category schemas for update
+    old_category = Category(name="Non-existent Category")
+    new_category = Category(name="New Name")
+    
+    # Attempt to update a non-existent category
+    with pytest.raises(Exception, match=f"Category with name {old_category.name} not found."):
+        categories.update_category(db=mock_db, old_category=old_category, new_category=new_category)
+
+def test_delete_category_existing(mock_db):
+    # Mock existing category
+    category_name = "Category to Delete"
+    mock_existing_category = Category(name=category_name, id=1)
+    
+    # Setup mock behavior for existing category
+    mock_db.query.return_value.filter.return_value.first.return_value = mock_existing_category
+    
+    # Mock the behavior of deleting and committing
+    mock_db.delete = MagicMock()
+    mock_db.commit = MagicMock()
+    
+    # Delete the category
+    category_schema = Category(name=category_name)
+    result = categories.delete_category(db=mock_db, category=category_schema)
+    
+    # Check that the deletion was successful
+    assert result is True
+    mock_db.delete.assert_called_once_with(mock_existing_category)
+    mock_db.commit.assert_called_once()
+
+def test_delete_category_not_found(mock_db):
+    # Setup mock behavior for non-existent category
+    mock_db.query.return_value.filter.return_value.first.return_value = None
+    
+    # Attempt to delete a non-existent category
+    category_name = "Non-existent Category"
+    category_schema = Category(name=category_name)
+    
+    with pytest.raises(Exception, match=f"Category with name {category_name} not found."):
+        categories.delete_category(db=mock_db, category=category_schema)
