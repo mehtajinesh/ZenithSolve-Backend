@@ -49,10 +49,10 @@ def test_get_categories(mock_db):
     ]
     
     # Setup mock behavior for retrieving categories
-    mock_db.query.return_value.offset.return_value.limit.return_value.all.return_value = mock_categories
+    mock_db.query.return_value.all.return_value = mock_categories
     
     # Call the function to get categories
-    categories_list = categories.get_categories(db=mock_db, skip=0, limit=10)
+    categories_list = categories.get_categories(db=mock_db)
     
     # Check that the retrieved categories match the mocked ones
     assert len(categories_list) == 4

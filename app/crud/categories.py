@@ -2,22 +2,20 @@ from sqlalchemy.orm import Session
 import app.db.models.category as models
 import app.schemas.categories as schemas
 
-def get_categories(db: Session, skip: int = 0, limit: int = 10):
+def get_categories(db: Session):
     """
     Retrieves a list of categories from the database.
 
-    This function queries the database for category records, applying pagination based on the provided
-    skip and limit values.
+    This function queries the database for category records
 
     Parameters:
         db (Session): The SQLAlchemy session used for querying the database.
-        skip (int, optional): The number of records to skip before returning results. Defaults to 0.
-        limit (int, optional): The maximum number of records to return. Defaults to 10.
+       
 
     Returns:
         List[models.Category]: A list of category objects retrieved from the database.
     """
-    categories = db.query(models.Category).offset(skip).limit(limit).all()
+    categories = db.query(models.Category).all()
     categories_names = [category.name for category in categories]
     return sorted(categories_names)
 

@@ -73,13 +73,11 @@ def create_category(category: Category, db: Session = Depends(get_db)):
 
 @format_response(List[str])
 @router.get("/categories/", response_model=List[str])
-def read_categories(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def read_categories(db: Session = Depends(get_db)):
     """
-    Retrieves a list of categories from the database using pagination.
+    Retrieves a list of categories from the database.
 
     Parameters:
-        skip (int): The number of categories to skip. Must be non-negative.
-        limit (int): The maximum number of categories to return. Must be non-negative.
         db (Session): The database session.
 
     Returns:
@@ -91,16 +89,8 @@ def read_categories(skip: int = 0, limit: int = 10, db: Session = Depends(get_db
             - 422: If validation fails
             - 500: If a database or unexpected error occurs
     """
-    if skip < 0 or limit < 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={
-                "message": "Invalid pagination parameters",
-                "error": "skip and limit must be non-negative"
-            }
-        )
     try:
-        retrieved_categories = categories.get_categories(db, skip=skip, limit=limit)
+        retrieved_categories = categories.get_categories(db)
         return retrieved_categories
     except IntegrityError as err:
         db.rollback()
