@@ -9,12 +9,12 @@ jobs:
   print-env-variables:
     runs-on: ubuntu-latest
     env:
-      DB_USERNAME: ${{ vars.DB_USERNAME }}
-      DB_HOST: ${{ vars.DB_HOST }}
-      DB_PORT: ${{ vars.DB_PORT }}
-      DB_NAME: ${{ vars.DB_NAME }}
-      POSTGRES_USER: ${{ vars.POSTGRES_USER }}
-      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+      DB_USERNAME: ${{ env.DB_USERNAME }}
+      DB_HOST: ${{ env.DB_HOST }}
+      DB_PORT: ${{ env.DB_PORT }}
+      DB_NAME: ${{ env.DB_NAME }}
+      POSTGRES_USER: ${{ env.POSTGRES_USER }}
+      POSTGRES_DB: ${{ env.POSTGRES_DB }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     steps:
       - name: Print Environment Variables
