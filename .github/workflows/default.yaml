@@ -1,0 +1,131 @@
+name: Test and Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        id: pytest
+        run: |
+          pytest tests/ --junitxml=test-results.xml
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Notify Slack - Unit Tests
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: |
+            Unit Tests ${{ job.status }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  build-and-test:
+    needs: unit-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        id: docker-build
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/myapp:test .
+
+      - name: Run tests in Docker
+        id: docker-test
+        run: docker run --rm ${{ secrets.DOCKERHUB_USERNAME }}/myapp:test pytest tests/
+
+      - name: Notify Slack - Docker Tests
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: |
+            Docker Tests ${{ job.status }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy files to server and deploy
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DO_SSH_HOST }}
+          username: ${{ secrets.DO_SSH_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          port: ${{ secrets.DO_SSH_PORT || 22 }}
+          source: "."
+          target: "~/app"
+
+      - name: Remote SSH and execute commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_SERVER_IP }}
+          username: ${{ secrets.DO_SERVER_USER }}
+          key: ${{ secrets.DO_SERVER_SSH_KEY }}
+          port: ${{ secrets.DO_SERVER_PORT || 22 }}
+          script: |
+            sh scripts/deploy-zenith-backend.sh backend
+
+      - name: Notify Slack - Deployment
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: |
+            Deployment to DigitalOcean ${{ job.status }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Author: ${{ github.actor }}
+            Server: ${{ secrets.DO_SSH_HOST }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
