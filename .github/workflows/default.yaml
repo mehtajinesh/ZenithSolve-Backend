@@ -9,17 +9,9 @@ jobs:
   print-env-variables:
     runs-on: ubuntu-latest
     steps:
-      - name: Print Environment Variables
-        run: |
-          echo "=== Environment Variables ==="
-          echo "DB_USERNAME: ${{ env.DB_USERNAME }}"
-          echo "DB_HOST: ${{ env.DB_HOST }}"
-          echo "DB_PORT: ${{ env.DB_PORT }}"
-          echo "DB_NAME: ${{ env.DB_NAME }}"
-          echo "POSTGRES_USER: ${{ env.POSTGRES_USER }}"
-          echo "POSTGRES_DB: ${{ env.POSTGRES_DB }}"
-          echo "=== Secrets ==="
-          echo "DB_PASSWORD: ${{ secrets.DB_PASSWORD }}"
+      - name: Print name
+        run: echo "DB Echo: ${{ env.DB_USERNAME }}"
+        run: echo "DB Echo: ${{ vars.DB_USERNAME }}"
   unit-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
