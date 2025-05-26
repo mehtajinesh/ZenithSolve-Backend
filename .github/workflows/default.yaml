@@ -1,4 +1,6 @@
 name: Test and Deploy to DigitalOcean
+env:
+  DB_USERNAME_1: 'Test'
 
 on:
   push:
@@ -7,8 +9,7 @@ on:
 
 jobs:
   print-env-variables:
-    env:
-      DB_USERNAME_1: ${{ vars.DB_USERNAME }}
+
     runs-on: ubuntu-latest
 
     steps:
