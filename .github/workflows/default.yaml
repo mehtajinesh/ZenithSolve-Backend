@@ -1,6 +1,6 @@
 name: Test and Deploy to DigitalOcean
 env:
-  DB_USERNAME_1: 'Test'
+  DB_USERNAME_1: ${{ vars.DB_USERNAME }}
 
 on:
   push:
