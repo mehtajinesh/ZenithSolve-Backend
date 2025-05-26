@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from app.schemas.problems import ProblemIn, ExampleItem
+from app.schemas.problems import ProblemIn
 from app.schemas.categories import Category
 import uuid
 from unittest.mock import MagicMock, ANY
@@ -31,7 +31,7 @@ def test_workflow(client: TestClient, mock_db):
     problem_id = 1  # Using integer ID
     
     # Create problem using the schema
-    example = ExampleItem(input="[1, 2]", output="3", explanation="1 + 2 = 3")
+    example = "Input: [1, 2] Output: 3 Explanation: 1 + 2 = 3"
     problem_in = ProblemIn(
         title="Test Problem",
         slug_id=unique_problem_slug,

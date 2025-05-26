@@ -5,11 +5,6 @@ from app.schemas.solutions import Solution
 from pydantic import Field
 from enum import Enum
 
-class ExampleItem(BaseModel):
-    input: str
-    output: str
-    explanation: str
-
 class ProblemDifficultyEnum(str, Enum):
     EASY = "Easy"
     MEDIUM = "Medium"
@@ -20,10 +15,10 @@ class ProblemIn(BaseModel):
     slug_id: str = Field(..., description="Unique identifier for the problem")
     title: str = Field(..., description="Title of the problem")
     difficulty: ProblemDifficultyEnum = Field(..., description="Difficulty of the problem [Easy, Medium, Hard]")
-    categories: List[str] = Field(default=[], description="List of categories associated with the problem")
+    categories: List[str] = Field(..., description="List of categories associated with the problem")
     description: str = Field(..., description="Detailed description of the problem")
-    constraints: List[str] = Field(default=[], description="List of constraints for the problem")
-    examples: List[ExampleItem] = Field(..., description="List of example inputs and outputs for the problem")
+    constraints: str = Field(default="", description="Constraints for the problem")
+    examples: List[str] = Field(default=[], description="List of example inputs and outputs for the problem")
 
     class Config:
         use_enum_values = True
@@ -32,10 +27,6 @@ class ProblemIn(BaseModel):
     @property
     def categories(self):
         return [cat.name for cat in self.categories] if self.categories else []
-    
-    @property
-    def examples(self):
-        return [example.__dict__ for example in self.examples] if self.examples else []
 
 class ProblemOut(ProblemIn):
     best_time_complexity: str = Field(description="Best time complexity of the solution")

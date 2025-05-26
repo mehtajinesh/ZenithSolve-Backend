@@ -1,6 +1,6 @@
 # tests/test_crud/test_problems.py
 import uuid
-from app.schemas.problems import ProblemIn, ExampleItem
+from app.schemas.problems import ProblemIn
 from app.db.models.problem import Problem
 from app.db.models.category import Category
 from app.crud import problems
@@ -16,7 +16,7 @@ def test_create_problem_existing(mock_db):
         difficulty="Medium",
         description="Existing Description",
         examples=[
-            ExampleItem(input="[1, 2]", output="3", explanation="1 + 2 = 3")
+            "[1, 2]", "3", "1 + 2 = 3"
         ],
         id=1
     )
@@ -31,7 +31,7 @@ def test_create_problem_existing(mock_db):
         difficulty="Medium",
         description="Existing Description",
         examples=[
-            ExampleItem(input="[1, 2]", output="3", explanation="1 + 2 = 3")
+            "[1, 2]", "3", "1 + 2 = 3"
         ],
         categories=["Test Category"]
     )
@@ -51,7 +51,7 @@ def test_create_problem_category_not_exist(mock_db):
         difficulty="Medium",
         description="New Description",
         examples=[
-            ExampleItem(input="[1, 2]", output="3", explanation="1 + 2 = 3")
+            "[1, 2]", "3", "1 + 2 = 3"
         ],
         categories=["NonExistentCategory"]
     )
@@ -76,7 +76,7 @@ def test_create_problem_new(mock_db):
         difficulty="Medium",
         description="New Description",
         examples=[
-            ExampleItem(input="[1, 2]", output="3", explanation="1 + 2 = 3")
+            "[1, 2]", "3", "1 + 2 = 3"
         ],
         categories=["Test Category"]
     )
@@ -110,8 +110,8 @@ def test_get_problem_existing(mock_db):
         difficulty="Medium",
         description="Existing Description",
         categories=[Category(name="Test Category")],
-        constraints=["1 <= input <= 100"],
-        examples='[{"input": "[1, 2]","output": "3","explanation": "1 + 2 = 3"}]',
+        constraints="1 <= input <= 100",
+        examples=["Input: [1, 2] Output: 3 Explanation: 1 + 2 = 3"],
         best_time_complexity = "NA",
         best_space_complexity = "NA",
         real_world_examples=[],
@@ -128,13 +128,13 @@ def test_get_problem_existing(mock_db):
     assert retrieved_problem.slug_id == unique_slug
     assert retrieved_problem.title == "Existing Problem"
     assert retrieved_problem.difficulty == "Medium"
-    assert retrieved_problem.constraints == ["1 <= input <= 100"]
+    assert retrieved_problem.constraints == "1 <= input <= 100"
     assert retrieved_problem.best_time_complexity == "NA"
     assert retrieved_problem.best_space_complexity == "NA"
     assert retrieved_problem.solutions == []
     assert retrieved_problem.description == "Existing Description"
     assert len(retrieved_problem.examples) == 1
-    assert retrieved_problem.examples[0].input == "[1, 2]"
+    assert retrieved_problem.examples[0] == "Input: [1, 2] Output: 3 Explanation: 1 + 2 = 3"
 
 def test_get_problem_not_found(mock_db):
     # Mock behavior for non-existent problem
@@ -155,8 +155,8 @@ def test_update_problem_success(mock_db):
         difficulty="Medium",
         description="Original Description",
         categories=[Category(name="Test Category")],
-        constraints=["1 <= input <= 100"],
-        examples='[{"input": "[1, 2]","output": "3","explanation": "1 + 2 = 3"}]',
+        constraints="1 <= input <= 100",
+        examples=["Input: [1, 2] Output: 3 Explanation: 1 + 2 = 3"],
         best_time_complexity="NA",
         best_space_complexity="NA",
         real_world_examples=[],
@@ -175,9 +175,9 @@ def test_update_problem_success(mock_db):
         title="Updated Title",
         difficulty="Hard",
         description="Updated Description",
-        constraints=["1 <= input <= 200"],
+        constraints="1 <= input <= 200",
         examples=[
-            ExampleItem(input="[3, 4]", output="7", explanation="3 + 4 = 7")
+            "Input: [3, 4] Output: 7 Explanation: 3 + 4 = 7"
         ],
         categories=["New Category"]
     )
@@ -189,7 +189,7 @@ def test_update_problem_success(mock_db):
     assert result["title"] == "Updated Title"
     assert result["difficulty"] == "Hard"
     assert result["description"] == "Updated Description"
-    assert result["constraints"] == ["1 <= input <= 200"]
+    assert result["constraints"] == "1 <= input <= 200"
     assert "New Category" in result["categories"]
     mock_db.commit.assert_called_once()
 

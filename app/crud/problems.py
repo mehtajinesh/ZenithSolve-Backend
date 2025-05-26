@@ -28,7 +28,7 @@ def get_problems(db: Session, skip: int = 0, limit: int = 10):
         difficulty=problem.difficulty,
         description=problem.description,
         constraints=problem.constraints,
-        examples= [schemas.ExampleItem(**example) for example in json.loads(problem.examples)] if problem.examples else [],
+        examples= problem.examples,
         categories=[cat.name for cat in problem.categories] if problem.categories else [],
         best_time_complexity=problem.best_time_complexity,
         best_space_complexity=problem.best_space_complexity,
@@ -47,7 +47,7 @@ def get_problem(db: Session, slug_id: str):
         "difficulty": problem.difficulty,
         "description": problem.description,
         "constraints": problem.constraints,
-        "examples": [schemas.ExampleItem(**example) for example in json.loads(problem.examples)] if problem.examples else [],
+        "examples": problem.examples,
         "categories": [cat.name for cat in problem.categories] if problem.categories else [],
         "best_time_complexity": problem.best_time_complexity,
         "best_space_complexity": problem.best_space_complexity,
@@ -69,13 +69,6 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
         if len(categories) != len(problem.categories):
             raise ValueError("One or more categories do not exist.")
     
-    # check if examples are provided or not, if yes, check if schema is valid
-    if problem.examples:
-        for example in problem.examples:
-            if not isinstance(example, schemas.ExampleItem):
-                raise ValueError("Invalid example schema provided.")
-    
-    json_examples = json.dumps([example.__dict__ for example in problem.examples])
     # Create new problem with data from schema
     db_problem = Problem(
         slug_id=problem.slug_id,
@@ -84,7 +77,7 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
         categories=categories,
         description=problem.description,
         constraints=problem.constraints,
-        examples=json_examples
+        examples=problem.examples
     )
     
     db.add(db_problem)
@@ -162,9 +155,7 @@ def update_problem(db: Session, problem_id: int, problem_update: schemas.Problem
     
     db_problem.slug_id = problem_update.slug_id
 
-    # Convert examples list to JSON string for storage
-    if problem_update.examples:
-        db_problem.examples = json.dumps([example.__dict__ for example in problem_update.examples])
+    db_problem.examples = problem_update.examples
     
     db_problem.categories = categories
     
@@ -177,7 +168,7 @@ def update_problem(db: Session, problem_id: int, problem_update: schemas.Problem
         "difficulty": db_problem.difficulty,
         "description": db_problem.description,
         "constraints": db_problem.constraints,
-        "examples": [schemas.ExampleItem(**example) for example in json.loads(db_problem.examples)] if db_problem.examples else [],
+        "examples": db_problem.examples,
         "categories": [cat.name for cat in db_problem.categories] if db_problem.categories else [],
         "best_time_complexity": db_problem.best_time_complexity,
         "best_space_complexity": db_problem.best_space_complexity,
