@@ -12,11 +12,11 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:17
         env:
-          POSTGRES_USER: ${{ env.DB_USERNAME }}
+          POSTGRES_USER: ${{ vars.DB_USERNAME }}
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_DB: ${{ vars.DB_NAME }}
         ports:
           - 5432:5432
         options: >-
@@ -32,7 +32,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
@@ -46,11 +46,11 @@ jobs:
           pytest tests/ --junitxml=test-results.xml
         env:
           PYTHONPATH: ${{ github.workspace }}
-          DB_USERNAME: ${{ env.DB_USERNAME }}
+          DB_USERNAME: ${{ vars.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_HOST: ${{ env.DB_HOST }}
-          DB_PORT: ${{ env.DB_PORT }}
-          DB_NAME: ${{ env.DB_NAME }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          DB_NAME: ${{ vars.DB_NAME }}
 
       - name: Notify Slack - Unit Tests
         if: always()
@@ -90,11 +90,7 @@ jobs:
 
       - name: Run tests in Docker
         id: docker-test
-        run: docker run --rm \
-          -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
-          -e API_KEY=${{ secrets.API_KEY }} \
-          -e ENVIRONMENT=test \
-          ${{ secrets.DOCKERHUB_USERNAME }}/myapp:test pytest tests/
+        run: docker run --rm {{ secrets.DOCKERHUB_USERNAME }}/myapp:test pytest tests/
 
       - name: Notify Slack - Docker Tests
         if: always()
@@ -116,19 +112,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Copy files to server and deploy
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.DO_SSH_HOST }}
-          username: ${{ secrets.DO_SSH_USER }}
-          key: ${{ secrets.DO_SSH_KEY }}
-          port: ${{ secrets.DO_SSH_PORT || 22 }}
-          source: "."
-          target: "~/app"
-
       - name: Remote SSH and execute commands
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -150,6 +133,6 @@ jobs:
             Branch: ${{ github.ref_name }}
             Commit: ${{ github.sha }}
             Author: ${{ github.actor }}
-            Server: ${{ secrets.DO_SSH_HOST }}
+            Server: ${{ secrets.DO_SERVER_IP }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
