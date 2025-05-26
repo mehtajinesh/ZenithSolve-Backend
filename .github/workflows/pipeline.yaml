@@ -64,7 +64,7 @@ jobs:
             Commit: ${{ github.sha }}
             Author: ${{ github.actor }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ZS_BE_WEBHOOK_URL }}
 
 
   deploy:
@@ -96,4 +96,4 @@ jobs:
             Author: ${{ github.actor }}
             Server: ${{ secrets.DO_SERVER_IP }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_ZS_BE_WEBHOOK_URL  }}

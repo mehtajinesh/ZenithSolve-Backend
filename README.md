@@ -2,7 +2,7 @@
 
 [![Latest Release](https://img.shields.io/github/v/release/mehtajinesh/ZenithSolve-Backend)](https://github.com/mehtajinesh/ZenithSolve-Backend/releases/latest)
 
-[![Test and Deploy to DigitalOcean](https://github.com/mehtajinesh/ZenithSolve-Backend/actions/workflows/default.yaml/badge.svg?branch=main)](https://github.com/mehtajinesh/ZenithSolve-Backend/actions/workflows/default.yaml)
+[![Test and Deploy to DigitalOcean](https://github.com/mehtajinesh/ZenithSolve-Backend/actions/workflows/pipeline.yaml/badge.svg?branch=main)](https://github.com/mehtajinesh/ZenithSolve-Backend/actions/workflows/pipeline.yaml)
 
 ## Project Overview
 ZenithSolve Backend is a robust and scalable backend solution designed to handle complex business logic and data processing. It provides a set of APIs for various functionalities and ensures high performance and security.
