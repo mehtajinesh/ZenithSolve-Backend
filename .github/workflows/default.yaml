@@ -8,14 +8,17 @@ on:
 jobs:
   print-env-variables:
     runs-on: ubuntu-latest
+    env:
+      DB_USERNAME_1: ${{ vars.DB_USERNAME }}
+      DB_HOST: ${{ env.DB_USERNAME }}
     steps:
       - name: Print name 1
         id: d1
-        run: echo "DB Echo - ${{ env.DB_USERNAME }}"
+        run: echo "DB Echo - $DB_USERNAME_1"
 
       - name: Print name 2
         id: d2
-        run: echo "DB Echo- ${{ vars.DB_USERNAME }}"
+        run: echo "DB Echo- $DB_HOST"
 
   unit-test:
     runs-on: ubuntu-latest
