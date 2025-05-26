@@ -11,11 +11,11 @@ jobs:
     steps:
       - name: Print name 1
         id: d1
-        run: echo "DB Echo: ${{ env.DB_USERNAME }}"
+        run: echo "DB Echo - ${{ env.DB_USERNAME }}"
 
       - name: Print name 2
         id: d2
-        run: echo "DB Echo: ${{ vars.DB_USERNAME }}"
+        run: echo "DB Echo- ${{ vars.DB_USERNAME }}"
 
   unit-test:
     runs-on: ubuntu-latest
