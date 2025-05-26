@@ -8,41 +8,20 @@ on:
 jobs:
   print-env-variables:
     runs-on: ubuntu-latest
-    env:
-      DB_USERNAME: ${{ env.DB_USERNAME }}
-      DB_HOST: ${{ env.DB_HOST }}
-      DB_PORT: ${{ env.DB_PORT }}
-      DB_NAME: ${{ env.DB_NAME }}
-      POSTGRES_USER: ${{ env.POSTGRES_USER }}
-      POSTGRES_DB: ${{ env.POSTGRES_DB }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     steps:
       - name: Print Environment Variables
         run: |
           echo "=== Environment Variables ==="
-          echo "DB_USERNAME: $DB_USERNAME"
-          echo "DB_HOST: $DB_HOST"
-          echo "DB_PORT: $DB_PORT"
-          echo "DB_NAME: $DB_NAME"
-          echo "POSTGRES_USER: $POSTGRES_USER"
-          echo "POSTGRES_DB: $POSTGRES_DB"
+          echo "DB_USERNAME: ${{ env.DB_USERNAME }}"
+          echo "DB_HOST: ${{ env.DB_HOST }}"
+          echo "DB_PORT: ${{ env.DB_PORT }}"
+          echo "DB_NAME: ${{ env.DB_NAME }}"
+          echo "POSTGRES_USER: ${{ env.POSTGRES_USER }}"
+          echo "POSTGRES_DB: ${{ env.POSTGRES_DB }}"
           echo "=== Secrets ==="
-          echo "DB_PASSWORD: $DB_PASSWORD"
-          echo "=== GitHub Context ==="
-          echo "Repository: $GITHUB_REPOSITORY"
-          echo "Workflow: $GITHUB_WORKFLOW"
-          echo "Run ID: $GITHUB_RUN_ID"
-
+          echo "DB_PASSWORD: ${{ secrets.DB_PASSWORD }}"
   unit-test:
     runs-on: ubuntu-latest
-    env:
-      DB_USERNAME: ${{ vars.DB_USERNAME }}
-      DB_HOST: ${{ vars.DB_HOST }}
-      DB_PORT: ${{ vars.DB_PORT }}
-      DB_NAME: ${{ vars.DB_NAME }}
-      POSTGRES_USER: ${{ vars.POSTGRES_USER }}
-      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     timeout-minutes: 10
 
     services:
@@ -81,11 +60,11 @@ jobs:
           pytest tests/ --junitxml=test-results.xml
         env:
           PYTHONPATH: ${{ github.workspace }}
-          DB_USERNAME: $DB_USERNAME
-          DB_PASSWORD: $DB_PASSWORD
-          DB_HOST: $DB_HOST
-          DB_PORT: $DB_PORT
-          DB_NAME: $DB_NAME
+          DB_USERNAME: ${{ vars.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ vars.DB_HOST }}
+          DB_PORT: ${{ vars.DB_PORT }}
+          DB_NAME: ${{ vars.DB_NAME }}
 
       - name: Notify Slack - Unit Tests
         if: always()
