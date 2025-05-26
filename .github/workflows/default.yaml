@@ -74,7 +74,7 @@ jobs:
 
     steps:
       - name: Remote SSH and execute commands
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DO_SERVER_IP }}
           username: ${{ secrets.DO_SERVER_USER }}
