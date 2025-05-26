@@ -66,8 +66,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  build-and-test:
-    needs: unit-test
+  build-docker-and-test:
+    needs: perform-unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -107,7 +107,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   deploy:
-    needs: build-and-test
+    needs: build-docker-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
