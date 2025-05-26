@@ -9,7 +9,6 @@ jobs:
   print-env-variables:
     env:
       DB_USERNAME_1: ${{ vars.DB_USERNAME }}
-      DB_HOST: ${{ env.DB_USERNAME }}
     runs-on: ubuntu-latest
 
     steps:
