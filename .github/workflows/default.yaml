@@ -1,6 +1,4 @@
 name: Test and Deploy to DigitalOcean
-env:
-  DB_USERNAME_1: ${{ vars.DB_USERNAME }}
 
 on:
   push:
@@ -8,20 +6,7 @@ on:
       - main
 
 jobs:
-  print-env-variables:
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Print name 1
-        id: d1
-        run: echo "DB Echo - $DB_USERNAME_1"
-
-      - name: Print name 2
-        id: d2
-        run: echo "DB Echo- $DB_HOST"
-
-  unit-test:
+  Perform Unit Tests:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
