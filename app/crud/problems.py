@@ -48,6 +48,7 @@ def get_problem(db: Session, slug_id: str):
         "description": problem.description,
         "constraints": problem.constraints,
         "examples": problem.examples,
+        "clarifying_questions": problem.clarifying_questions,
         "categories": [cat.name for cat in problem.categories] if problem.categories else [],
         "best_time_complexity": problem.best_time_complexity,
         "best_space_complexity": problem.best_space_complexity,
@@ -77,7 +78,8 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
         categories=categories,
         description=problem.description,
         constraints=problem.constraints,
-        examples=problem.examples
+        examples=problem.examples,
+        clarifying_questions=problem.clarifying_questions
     )
     
     db.add(db_problem)
@@ -91,6 +93,7 @@ def create_problem(db: Session, problem: schemas.ProblemIn):
         "description": db_problem.description,
         "constraints": db_problem.constraints,
         "examples": problem.examples,
+        "clarifying_questions": problem.clarifying_questions,
         "categories": problem.categories,
         "best_time_complexity": "NA",
         "best_space_complexity": "NA",
@@ -143,7 +146,7 @@ def update_problem(db: Session, problem_id: int, problem_update: schemas.Problem
     
     # Update scalar attributes
     for key, value in problem_update.__dict__.items():
-        if key in ["slug_id", "examples", "categories"]:
+        if key in ["slug_id", "examples", "categories", "clarifying_questions"]:
             continue
         setattr(db_problem, key, value)
     
@@ -154,9 +157,8 @@ def update_problem(db: Session, problem_id: int, problem_update: schemas.Problem
             raise ValueError(f"Problem with slug_id '{problem_update.slug_id}' already exists.")
     
     db_problem.slug_id = problem_update.slug_id
-
     db_problem.examples = problem_update.examples
-    
+    db_problem.clarifying_questions = problem_update.clarifying_questions
     db_problem.categories = categories
     
     db.commit()
@@ -169,6 +171,7 @@ def update_problem(db: Session, problem_id: int, problem_update: schemas.Problem
         "description": db_problem.description,
         "constraints": db_problem.constraints,
         "examples": db_problem.examples,
+        "clarifying_questions": db_problem.clarifying_questions,
         "categories": [cat.name for cat in db_problem.categories] if db_problem.categories else [],
         "best_time_complexity": db_problem.best_time_complexity,
         "best_space_complexity": db_problem.best_space_complexity,

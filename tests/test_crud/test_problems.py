@@ -109,6 +109,7 @@ def test_get_problem_existing(mock_db):
         title="Existing Problem",
         difficulty="Medium",
         description="Existing Description",
+        clarifying_questions = ["Sample Question"],
         categories=[Category(name="Test Category")],
         constraints="1 <= input <= 100",
         examples=["Input: [1, 2] Output: 3 Explanation: 1 + 2 = 3"],
@@ -132,6 +133,7 @@ def test_get_problem_existing(mock_db):
     assert retrieved_problem.best_time_complexity == "NA"
     assert retrieved_problem.best_space_complexity == "NA"
     assert retrieved_problem.solutions == []
+    assert retrieved_problem.clarifying_questions == ["Sample Question"]
     assert retrieved_problem.description == "Existing Description"
     assert len(retrieved_problem.examples) == 1
     assert retrieved_problem.examples[0] == "Input: [1, 2] Output: 3 Explanation: 1 + 2 = 3"

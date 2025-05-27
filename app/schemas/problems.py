@@ -19,6 +19,7 @@ class ProblemIn(BaseModel):
     description: str = Field(..., description="Detailed description of the problem")
     constraints: str = Field(default="", description="Constraints for the problem")
     examples: List[str] = Field(default=[], description="List of example inputs and outputs for the problem")
+    clarifying_questions: List[str] = Field(default=[], description="List of clarifying questions for the problem")
 
     class Config:
         use_enum_values = True
